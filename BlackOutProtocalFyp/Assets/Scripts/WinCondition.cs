@@ -21,7 +21,7 @@ public class WinCondition : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.tag == "Collection")
+        if (other.gameObject.tag == "Objective")
         {
             Objective = true;
         }

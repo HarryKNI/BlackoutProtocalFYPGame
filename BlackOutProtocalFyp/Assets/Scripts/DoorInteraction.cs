@@ -23,7 +23,7 @@ public class DoorInteraction : MonoBehaviour
         {
             closeToDoor = true;
             Door = collision.gameObject;
-            print(Door);
+            
         }
     }
 
@@ -32,7 +32,7 @@ public class DoorInteraction : MonoBehaviour
 
         if (collision.gameObject.tag == "Door")
         {
-            closeToDoor = true;
+            closeToDoor = false;
             Door.GetComponent<Animator>().SetBool("OpenDoor", false);
             
         }
