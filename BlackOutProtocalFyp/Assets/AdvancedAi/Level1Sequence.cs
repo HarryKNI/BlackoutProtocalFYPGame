@@ -20,6 +20,8 @@ public partial class Level1Sequence : Composite
     }
 
     protected override void OnEnd()
-    {    }
+    {
+        
+    }
 }
 
