@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering;
 
-public class SimpleAi : MonoBehaviour
+public class AdvancedAi : MonoBehaviour
 {
 
     public enum States { Idle, Chasing, Evading, Shooting, Patrolling, AiReturn };
@@ -15,7 +15,8 @@ public class SimpleAi : MonoBehaviour
     [Header("Ai And Player")]
     public NavMeshAgent AI;
     public Transform Player;
-    public LayerMask whatIsGround, whatIsPlayer;
+    public LayerMask IsObsticale, IsPlayer;
+    
 
     [Header("Attacking Vectors")]
     public float timeBetweenAttacks;
@@ -26,6 +27,10 @@ public class SimpleAi : MonoBehaviour
     public float attackRange;
     public bool playerInsight;
     public bool playerInAttackRange;
+    public bool TopRaycast;
+    public bool MiddleRaycast;
+    public bool BottomRaycast;
+    public bool ObsticaleRaycast;
 
     private bool TimerStart = false;
     private bool TimerDone = false;
@@ -38,6 +43,9 @@ public class SimpleAi : MonoBehaviour
     {
         Player = GameObject.Find("Player").transform;
         AI = GetComponent<NavMeshAgent>();
+
+        
+        
     }
 
     // Update is called once per frame
@@ -64,13 +72,40 @@ public class SimpleAi : MonoBehaviour
                 break;
 
         }
+        Vector3 Toptransform = transform.position + new Vector3(0, 3, 0);
+        Vector3 Middletranaform = transform.position + new Vector3(0,2,0);
+        Vector3 Bottomtransform = transform.position - new Vector3(0, 0, 0);
 
-        playerInsight = Physics.CheckSphere(transform.position, sightRange, whatIsPlayer);
-        playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
 
-        if (!playerInsight && !playerInAttackRange ) m_States = States.Patrolling;
-        if (playerInsight && !playerInAttackRange && AI.Raycast(Player.position, out Hit) == false) m_States = States.Chasing;
-        if (playerInsight && playerInAttackRange && AI.Raycast(Player.position, out Hit) == false) m_States = States.Shooting;
+        playerInsight = Physics.CheckSphere(transform.position, sightRange, IsPlayer);
+        playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, IsPlayer);
+
+        TopRaycast = Physics.Raycast(Toptransform, transform.forward, 15, IsPlayer );
+        MiddleRaycast = Physics.Raycast(Middletranaform, transform.forward, 15, IsPlayer);
+        BottomRaycast = Physics.Raycast(Bottomtransform, transform.forward, 15, IsPlayer);
+        ObsticaleRaycast = Physics.Raycast(Bottomtransform, transform.forward, 10, IsObsticale);
+
+        Debug.DrawRay(Toptransform, transform.forward, Color.red);
+
+        if (!playerInsight && !playerInAttackRange) m_States = States.Patrolling;
+        if (playerInsight /*&& !playerInAttackRange*/) 
+        {
+            if (TopRaycast && MiddleRaycast && BottomRaycast && !ObsticaleRaycast) 
+            {
+                m_States = States.Chasing;
+            }
+
+            if (TopRaycast && MiddleRaycast && !BottomRaycast && !ObsticaleRaycast)
+            {
+                m_States = States.Chasing;
+            }
+
+            if (!TopRaycast && !MiddleRaycast && !BottomRaycast && ObsticaleRaycast)
+            {
+                m_States = States.Patrolling;
+            }
+        } 
+        //if (playerInsight && playerInAttackRange && AI.Raycast(Player.position, out Hit) == false) m_States = States.Shooting;
 
         if (TimerStart == true)
         {
@@ -104,6 +139,8 @@ public class SimpleAi : MonoBehaviour
     {
         AI.SetDestination(Player.position);
         transform.LookAt(Player);
+
+        
     }
 
     public void Shooting()
@@ -127,7 +164,7 @@ public class SimpleAi : MonoBehaviour
 
     public void Evading()
     {
-        
+
     }
 
     public void Patrolling()
@@ -144,42 +181,25 @@ public class SimpleAi : MonoBehaviour
 
     private void OnTriggerEnter(Collider Coll)
     {
-        
-        //if (Coll.gameObject.tag == "Player" && AI.Raycast(Player.position, out Hit) == false)
-        //{
-        //    TimerStart = false;
-        //    TimerDone = true;
-        //    m_States = States.Chasing;
-        //}
 
-        if (Coll.gameObject.tag == "AiBoundary")
+        if (Coll.gameObject.tag != "AiBoundary")
         {
             m_States = States.AiReturn;
         }
 
-    }
-
-    private void OnTriggerExit(Collider Coll)
-    {
-        //if (Coll.gameObject.tag == "Player")
-        //{
-        //    TimerStart = true;
-        //    m_States = States.Idle;
-        //}
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.tag == "Search_Point")
+        if (Coll.gameObject.tag == "Search_Point")
         {
             m_States = States.Idle;
             TimerStart = true;
             print("Triggered");
             RndNum = UnityEngine.Random.Range(0, SearchPoints.Count);
         }
+
     }
 
-   
+    
+
+
 
 
 
