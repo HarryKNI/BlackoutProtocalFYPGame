@@ -74,7 +74,7 @@ public class AdvancedAi : MonoBehaviour
         }
         Vector3 Toptransform = transform.position + new Vector3(0, 3, 0);
         Vector3 Middletranaform = transform.position + new Vector3(0,2,0);
-        Vector3 Bottomtransform = transform.position - new Vector3(0, 0, 0);
+        Vector3 Bottomtransform = transform.position + new Vector3(0, 0, 0);
 
 
         playerInsight = Physics.CheckSphere(transform.position, sightRange, IsPlayer);
@@ -85,7 +85,7 @@ public class AdvancedAi : MonoBehaviour
         BottomRaycast = Physics.Raycast(Bottomtransform, transform.forward, 15, IsPlayer);
         ObsticaleRaycast = Physics.Raycast(Bottomtransform, transform.forward, 10, IsObsticale);
 
-        Debug.DrawRay(Toptransform, transform.forward, Color.red);
+        //Debug.DrawRay(Toptransform, transform.forward, Color.red);
 
         if (!playerInsight && !playerInAttackRange) m_States = States.Patrolling;
         if (playerInsight /*&& !playerInAttackRange*/) 
@@ -182,10 +182,10 @@ public class AdvancedAi : MonoBehaviour
     private void OnTriggerEnter(Collider Coll)
     {
 
-        if (Coll.gameObject.tag != "AiBoundary")
+        /*if (Coll.gameObject.tag != "AiBoundary")
         {
             m_States = States.AiReturn;
-        }
+        }*/
 
         if (Coll.gameObject.tag == "Search_Point")
         {
