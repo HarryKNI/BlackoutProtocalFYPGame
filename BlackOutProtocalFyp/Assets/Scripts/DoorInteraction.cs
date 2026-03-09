@@ -1,8 +1,12 @@
 using UnityEngine.InputSystem;
 using UnityEngine;
+using Unity.VisualScripting;
 
 public class DoorInteraction : MonoBehaviour
 {
+    [SerializeField] private AudioSource Audio;
+    [SerializeField] private float soundRange = 25f;
+    public Vector3 SoundPos;
     private bool closeToDoor = false;
     private GameObject Door;
 
@@ -11,7 +15,16 @@ public class DoorInteraction : MonoBehaviour
         if (value.isPressed && closeToDoor == true)
         {
             Door.GetComponent<Animator>().SetBool("OpenDoor", true);
-            print(Door);
+            Audio = Door.GetComponent<AudioSource>();
+            if (Audio.isPlaying)
+            { return; }
+            Audio.Play();
+            var sound = new Sound(transform.position, soundRange);
+            SoundPos = sound.SoundPosition;
+            Sounds.MakeSound(sound);
+            
+
+            //print($"Sound: with pos {sound.SoundPosition} and range {sound.SoundRange} created!");
             
         }
     }
@@ -24,6 +37,7 @@ public class DoorInteraction : MonoBehaviour
             closeToDoor = true;
             Door = collision.gameObject;
             
+
         }
     }
 

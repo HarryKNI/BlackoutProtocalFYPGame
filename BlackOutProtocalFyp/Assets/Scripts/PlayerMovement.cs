@@ -1,15 +1,31 @@
+using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
+
+    [Header("Movement Parameters")]
     private CharacterController cc;
-    [SerializeField] private float MaxSpeed;
-    [SerializeField] private float Acceleration;
+    [SerializeField]private float MaxSpeed => SprintInput ? SprintSpeed : WalkSpeed;
+    [SerializeField] private float Acceleration = 15f;
+
+    [SerializeField] float WalkSpeed = 3.5f;
+    [SerializeField] float SprintSpeed = 8f;
+
+    [Space(15)]
+    [Tooltip("This is how high the character can jump.")]
+    [SerializeField] float JumpHeight = 2f;
+
     
 
-    public Vector3 CurrentVelocity;
-    public float CurrentSpeed;
+    public bool Sprinting
+    {
+        get
+        {
+            return SprintInput && CurrentSpeed > 0.1f;
+        }
+    }
 
     public Vector2 LookSensitivity = new Vector2(0.1f, 0.1f);
 
@@ -27,8 +43,32 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    [Header("Camera Parameters")]
+    [SerializeField] float CameraNormalFOV = 90f;
+    [SerializeField] float CameraSprintFOV = 110f;
+    [SerializeField] float CameraFOVSmoothing = 1f;
+
+    float TargetCameraFOV
+    {
+        get
+        {
+            return Sprinting ? CameraSprintFOV : CameraNormalFOV;
+        }
+    }
+
+    [Header("PhysicsParameter")]
+    [SerializeField] float GravityScale = 3f;
+
+    public float VerticalVelocity = 0f;
+
+    public Vector3 CurrentVelocity;
+    public float CurrentSpeed;
+    public bool isGrounded => cc.isGrounded;
+
+    [Header("Input")]
     public Vector2 MovementInput;
     public Vector2 LookInput;
+    public bool SprintInput;
 
 
     [SerializeField] Camera PlayerCamera;
@@ -50,6 +90,17 @@ public class PlayerMovement : MonoBehaviour
         {
             Look();
         }
+        CameraUpdate();
+    }
+
+    public void TryJump()
+    {
+        if (isGrounded == false)
+        {
+            return;
+        }
+
+        VerticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Physics.gravity.y * GravityScale);
     }
 
     public void MovePlayer()
@@ -67,9 +118,16 @@ public class PlayerMovement : MonoBehaviour
             CurrentVelocity = Vector3.MoveTowards(CurrentVelocity, Vector3.zero, Acceleration * Time.deltaTime);
         }
 
-        float VerticalVelocity = Physics.gravity.y * 20.0f * Time.deltaTime;
+         if (isGrounded && VerticalVelocity <= 0.01f)
+        {
+            VerticalVelocity = -3f;
+        }
+        else
+        {
+            VerticalVelocity += Physics.gravity.y * GravityScale * Time.deltaTime;
+        }
 
-        Vector3 fullVelocity = new Vector3(CurrentVelocity.x, VerticalVelocity, CurrentVelocity.z);
+            Vector3 fullVelocity = new Vector3(CurrentVelocity.x, VerticalVelocity, CurrentVelocity.z);
 
         cc.Move(fullVelocity * Time.deltaTime);
 
@@ -88,6 +146,22 @@ public class PlayerMovement : MonoBehaviour
         transform.Rotate(Vector3.up * input.x);
     }
 
+    public void CameraUpdate()
+    {
+
+        float targetFOV = CameraNormalFOV;
+
+        if (Sprinting)
+        {
+            float speedRatio = CurrentSpeed / SprintSpeed;
+
+            targetFOV = Mathf.Lerp(CameraNormalFOV, CameraSprintFOV, speedRatio);
+        }
+
+
+        PlayerCamera.fieldOfView = Mathf.Lerp(PlayerCamera.fieldOfView, targetFOV, CameraFOVSmoothing *  Time.deltaTime);
+    }
+
     void OnMove(InputValue value)
     {
         MovementInput = value.Get<Vector2>();
@@ -96,5 +170,18 @@ public class PlayerMovement : MonoBehaviour
     void OnLook(InputValue value)
     {
         LookInput = value.Get<Vector2>();
+    }
+
+    void OnSprint(InputValue value)
+    {
+        SprintInput = value.isPressed;
+    }
+
+    void OnJump(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            TryJump();
+        }
     }
 }

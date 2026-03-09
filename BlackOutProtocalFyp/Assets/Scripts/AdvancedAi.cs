@@ -1,12 +1,13 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering;
 
-public class AdvancedAi : MonoBehaviour
+public class AdvancedAi : MonoBehaviour, HearSound
 {
 
-    public enum States { Idle, Chasing, Evading, Shooting, Patrolling, AiReturn };
+    public enum States { Idle, Chasing, Evading, Shooting, Patrolling, AiReturn, SoundHeard };
     public States m_States;
 
     [Header("Searchpoints List")]
@@ -38,6 +39,8 @@ public class AdvancedAi : MonoBehaviour
 
     private int RndNum = 0;
     private float Timer = 10.0f;
+    public DoorInteraction DoorInteract;
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Awake()
     {
@@ -67,6 +70,9 @@ public class AdvancedAi : MonoBehaviour
             case States.Patrolling:
                 Patrolling();
                 break;
+            case States.SoundHeard:
+                SoundHeard();
+                break;
             default:
                 AiReturn();
                 break;
@@ -87,7 +93,7 @@ public class AdvancedAi : MonoBehaviour
 
         //Debug.DrawRay(Toptransform, transform.forward, Color.red);
 
-        if (!playerInsight && !playerInAttackRange) m_States = States.Patrolling;
+        //if (!playerInsight && !playerInAttackRange) m_States = States.Patrolling;
         if (playerInsight /*&& !playerInAttackRange*/) 
         {
             if (TopRaycast && MiddleRaycast && BottomRaycast && !ObsticaleRaycast) 
@@ -100,7 +106,7 @@ public class AdvancedAi : MonoBehaviour
                 m_States = States.Chasing;
             }
 
-            if (!TopRaycast && !MiddleRaycast && !BottomRaycast && ObsticaleRaycast)
+            if (!TopRaycast && !MiddleRaycast && !BottomRaycast)
             {
                 m_States = States.Patrolling;
             }
@@ -109,7 +115,6 @@ public class AdvancedAi : MonoBehaviour
 
         if (TimerStart == true)
         {
-            print(Timer);
             Timer -= Time.deltaTime;
 
         }
@@ -121,7 +126,12 @@ public class AdvancedAi : MonoBehaviour
         }
 
 
-
+        
+    }
+    public void RespondToSound(Sound sound)
+    {
+        print(name + " Responding to sound");
+        m_States = States.SoundHeard;
     }
 
     public void Idle()
@@ -179,6 +189,11 @@ public class AdvancedAi : MonoBehaviour
         AI.SetDestination(SearchPoints[1].position);
     }
 
+    public void SoundHeard()
+    {
+        AI.SetDestination(DoorInteract.SoundPos);
+    }
+
     private void OnTriggerEnter(Collider Coll)
     {
 
@@ -191,7 +206,6 @@ public class AdvancedAi : MonoBehaviour
         {
             m_States = States.Idle;
             TimerStart = true;
-            print("Triggered");
             RndNum = UnityEngine.Random.Range(0, SearchPoints.Count);
         }
 
