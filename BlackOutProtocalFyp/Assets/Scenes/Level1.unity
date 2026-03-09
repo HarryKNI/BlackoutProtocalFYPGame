@@ -1158,7 +1158,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 500
+  MaxDistance: 20
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -2097,7 +2097,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 1511a62848636b544b783dcae5b746f5, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -2106,8 +2106,8 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
+  MinDistance: 7.4876976
+  MaxDistance: 20
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -4142,7 +4142,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Audio: {fileID: 0}
-  soundRange: 25
+  soundRange: 20
   SoundPos: {x: 0, y: 0, z: 0}
 --- !u!136 &1473818125
 CapsuleCollider:
@@ -4161,7 +4161,7 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.5
   m_Height: 2
@@ -6921,6 +6921,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 3133293061921288946, guid: 4d7c3441f36ad314eac2f1f4517aca7d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 3140587153035317586, guid: 4d7c3441f36ad314eac2f1f4517aca7d, type: 3}
       propertyPath: m_Layer
       value: 6
@@ -8824,6 +8828,10 @@ PrefabInstance:
     - target: {fileID: 5580629511381572874, guid: 4d7c3441f36ad314eac2f1f4517aca7d, type: 3}
       propertyPath: m_Layer
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5580629511381572874, guid: 4d7c3441f36ad314eac2f1f4517aca7d, type: 3}
+      propertyPath: m_TagString
+      value: Door
       objectReference: {fileID: 0}
     - target: {fileID: 5581028136295941586, guid: 4d7c3441f36ad314eac2f1f4517aca7d, type: 3}
       propertyPath: m_Layer
@@ -12628,7 +12636,7 @@ MonoBehaviour:
   MiddleRaycast: 0
   BottomRaycast: 0
   ObsticaleRaycast: 0
-  DoorInteraction: {fileID: 1473818124}
+  DoorInteract: {fileID: 1473818124}
 --- !u!1 &2003434153 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7109733227971447714, guid: 4d7c3441f36ad314eac2f1f4517aca7d, type: 3}
