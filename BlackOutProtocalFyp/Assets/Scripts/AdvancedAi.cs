@@ -40,6 +40,9 @@ public class AdvancedAi : MonoBehaviour, HearSound
     private int RndNum = 0;
     private float Timer = 10.0f;
     public DoorInteraction DoorInteract;
+
+    [Header("Visibilty")]
+    float visibility;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Awake()
@@ -96,7 +99,37 @@ public class AdvancedAi : MonoBehaviour, HearSound
         //if (!playerInsight && !playerInAttackRange) m_States = States.Patrolling;
         if (playerInsight /*&& !playerInAttackRange*/) 
         {
-            if (TopRaycast && MiddleRaycast && BottomRaycast && !ObsticaleRaycast) 
+            if (TopRaycast)
+            {
+                visibility = 0.5f;
+            }
+
+            if (MiddleRaycast)
+            {
+                visibility = 0.3f;
+            }
+
+            if (BottomRaycast)
+            {
+                visibility = 0.2f;
+            }
+
+            if (TopRaycast && MiddleRaycast) 
+            {
+                visibility = 1f;
+            }
+
+            if (MiddleRaycast && BottomRaycast)
+            {
+                visibility = 0.5f;
+            }
+
+            if (TopRaycast && BottomRaycast)
+            {
+                visibility = 0.6f;
+            }
+
+            /*if (TopRaycast && MiddleRaycast && BottomRaycast && !ObsticaleRaycast) 
             {
                 m_States = States.Chasing;
             }
@@ -109,7 +142,7 @@ public class AdvancedAi : MonoBehaviour, HearSound
             if (!TopRaycast && !MiddleRaycast && !BottomRaycast)
             {
                 m_States = States.Patrolling;
-            }
+            }*/
         } 
         //if (playerInsight && playerInAttackRange && AI.Raycast(Player.position, out Hit) == false) m_States = States.Shooting;
 
@@ -125,6 +158,25 @@ public class AdvancedAi : MonoBehaviour, HearSound
             TimerDone = false;
         }
 
+        if (visibility == 0f)
+        {
+            m_States = States.Patrolling;
+        }
+
+        if (visibility > 0f && visibility < 3f)
+        {
+            // Suspicious state
+        }
+
+        if (visibility > 3f && visibility < 7f)
+        {
+            // Investigation State
+        }
+
+        if (visibility >7f &&  visibility < 11f)
+        {
+            // Chase State
+        }
 
         
     }
