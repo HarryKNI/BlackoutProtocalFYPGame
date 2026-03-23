@@ -41,6 +41,16 @@ public class AdvancedAi : MonoBehaviour, HearSound
     private float Timer = 10.0f;
     public DoorInteraction DoorInteract;
 
+    private float TopVisibilityPercent = 0.7f;
+    private float MiddleVisibilityPercent = 0.5f;
+    private float BottomVisibilityPercent = 0.3f;
+
+    private float FarDistance = 0.1f;
+    private float MiddleDistance = 0.3f;
+    private float CloseDistance = 0.5f;
+
+    public float VisibilityScore = 0.0f;
+
     [Header("Visibilty")]
     float visibility;
     
@@ -99,56 +109,47 @@ public class AdvancedAi : MonoBehaviour, HearSound
         //if (!playerInsight && !playerInAttackRange) m_States = States.Patrolling;
         if (playerInsight /*&& !playerInAttackRange*/) 
         {
+            print("VisibilityScore: " + VisibilityScore);
             if (TopRaycast)
             {
-                visibility = 0.5f;
+                VisibilityScore = TopVisibilityPercent;
             }
 
             if (MiddleRaycast)
             {
-                visibility = 0.3f;
+                VisibilityScore = MiddleVisibilityPercent;
             }
 
             if (BottomRaycast)
             {
-                visibility = 0.2f;
+                VisibilityScore = BottomVisibilityPercent;
             }
 
             if (TopRaycast && MiddleRaycast) 
             {
-                visibility = 1f;
+                VisibilityScore = TopVisibilityPercent + MiddleVisibilityPercent;
             }
 
             if (MiddleRaycast && BottomRaycast)
             {
-                visibility = 0.5f;
+                VisibilityScore = MiddleVisibilityPercent + BottomVisibilityPercent;
             }
 
             if (TopRaycast && BottomRaycast)
             {
-                visibility = 0.6f;
+                VisibilityScore = TopVisibilityPercent + BottomVisibilityPercent;
             }
-
-            /*if (TopRaycast && MiddleRaycast && BottomRaycast && !ObsticaleRaycast) 
-            {
-                m_States = States.Chasing;
-            }
-
-            if (TopRaycast && MiddleRaycast && !BottomRaycast && !ObsticaleRaycast)
-            {
-                m_States = States.Chasing;
-            }
-
             if (!TopRaycast && !MiddleRaycast && !BottomRaycast)
             {
-                m_States = States.Patrolling;
-            }*/
+                VisibilityScore = 0;
+            }
         } 
         //if (playerInsight && playerInAttackRange && AI.Raycast(Player.position, out Hit) == false) m_States = States.Shooting;
 
         if (TimerStart == true)
         {
             Timer -= Time.deltaTime;
+            print(Timer);
 
         }
 
@@ -158,27 +159,28 @@ public class AdvancedAi : MonoBehaviour, HearSound
             TimerDone = false;
         }
 
-        if (visibility == 0f)
+        
+
+        if (VisibilityScore > 0f && VisibilityScore < 0.4f)
+        {
+            print("IM a little suspicious");
+        }
+
+        if (VisibilityScore > 0.4f && VisibilityScore < 0.7f)
+        {
+            print("Im gonna investigate");
+        }
+
+        if (VisibilityScore >0.7f && VisibilityScore < 1.5f)
+        {
+            m_States = States.Chasing;
+        }
+
+        if (VisibilityScore == 0f)
         {
             m_States = States.Patrolling;
         }
 
-        if (visibility > 0f && visibility < 3f)
-        {
-            // Suspicious state
-        }
-
-        if (visibility > 3f && visibility < 7f)
-        {
-            // Investigation State
-        }
-
-        if (visibility >7f &&  visibility < 11f)
-        {
-            // Chase State
-        }
-
-        
     }
     public void RespondToSound(Sound sound)
     {
@@ -188,7 +190,7 @@ public class AdvancedAi : MonoBehaviour, HearSound
 
     public void Idle()
     {
-        if (Timer == 0)
+        if (Timer <= 0)
         {
             TimerDone = true;
             TimerStart = false;
