@@ -7,7 +7,7 @@ using UnityEngine.Rendering;
 public class AdvancedAi : MonoBehaviour, HearSound
 {
 
-    public enum States { Idle, Chasing, Evading, Shooting, Patrolling, AiReturn, SoundHeard };
+    public enum States { Idle, Chasing, Seen, Suspisious, Evading, Shooting, Patrolling, AiReturn, SoundHeard };
     public States m_States;
 
     [Header("Searchpoints List")]
@@ -45,11 +45,15 @@ public class AdvancedAi : MonoBehaviour, HearSound
     private float MiddleVisibilityPercent = 0.5f;
     private float BottomVisibilityPercent = 0.3f;
 
-    private float FarDistance = 0.1f;
-    private float MiddleDistance = 0.3f;
-    private float CloseDistance = 0.5f;
+    private float Distance;
+
+    private float FarDistancePercent = 0.1f;
+    private float MiddleDistancePercent = 0.3f;
+    private float CloseDistancePercent = 0.5f;
 
     public float VisibilityScore = 0.0f;
+
+    private Vector3 lastPlayerPosition;
 
     [Header("Visibilty")]
     float visibility;
@@ -74,6 +78,10 @@ public class AdvancedAi : MonoBehaviour, HearSound
                 break;
             case States.Chasing:
                 Chasing();
+                break;
+            case States.Seen:
+                break;
+            case States.Suspisious:
                 break;
             case States.Evading:
                 break;
@@ -109,7 +117,6 @@ public class AdvancedAi : MonoBehaviour, HearSound
         //if (!playerInsight && !playerInAttackRange) m_States = States.Patrolling;
         if (playerInsight /*&& !playerInAttackRange*/) 
         {
-            print("VisibilityScore: " + VisibilityScore);
             if (TopRaycast)
             {
                 VisibilityScore = TopVisibilityPercent;
@@ -143,6 +150,26 @@ public class AdvancedAi : MonoBehaviour, HearSound
             {
                 VisibilityScore = 0;
             }
+
+            Distance = Vector3.Distance(transform.position,Player.transform.position);
+            print("Distance:" + Distance);
+
+            if (Distance > 0f &&  Distance < 5)
+            {
+                VisibilityScore = +CloseDistancePercent;
+            }
+
+            if (Distance > 5f && Distance < 10f)
+            {
+                VisibilityScore += MiddleDistancePercent;
+            }
+
+            if (Distance > 10f)
+            {
+                VisibilityScore += FarDistancePercent;
+            }
+
+            lastPlayerPosition = Player.position;
         } 
         //if (playerInsight && playerInAttackRange && AI.Raycast(Player.position, out Hit) == false) m_States = States.Shooting;
 
@@ -207,6 +234,16 @@ public class AdvancedAi : MonoBehaviour, HearSound
         
     }
 
+    public void Seen()
+    {
+        
+    }
+
+
+    public void Suspisious()
+    {
+        AI.SetDestination(lastPlayerPosition);
+    }
     public void Shooting()
     {
         AI.SetDestination(Player.position);
