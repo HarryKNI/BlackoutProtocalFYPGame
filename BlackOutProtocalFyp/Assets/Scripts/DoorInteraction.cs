@@ -1,6 +1,5 @@
 using UnityEngine.InputSystem;
 using UnityEngine;
-using Unity.VisualScripting;
 
 public class DoorInteraction : MonoBehaviour
 {
@@ -14,6 +13,7 @@ public class DoorInteraction : MonoBehaviour
     {
         if (value.isPressed && closeToDoor == true)
         {
+            print("OpenDoor");
             Door.GetComponent<Animator>().SetBool("OpenDoor", true);
             Audio = Door.GetComponent<AudioSource>();
             if (Audio.isPlaying)

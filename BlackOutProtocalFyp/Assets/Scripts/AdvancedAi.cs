@@ -156,7 +156,7 @@ public class AdvancedAi : MonoBehaviour, HearSound
 
             if (Distance > 0f &&  Distance < 5)
             {
-                VisibilityScore = +CloseDistancePercent;
+                VisibilityScore += CloseDistancePercent;
             }
 
             if (Distance > 5f && Distance < 10f)
@@ -190,12 +190,12 @@ public class AdvancedAi : MonoBehaviour, HearSound
 
         if (VisibilityScore > 0f && VisibilityScore < 0.4f)
         {
-            print("IM a little suspicious");
+            m_States = States.Seen;
         }
 
         if (VisibilityScore > 0.4f && VisibilityScore < 0.7f)
         {
-            print("Im gonna investigate");
+            m_States = States.Suspisious;
         }
 
         if (VisibilityScore >0.7f && VisibilityScore < 1.5f)
@@ -228,6 +228,7 @@ public class AdvancedAi : MonoBehaviour, HearSound
 
     public void Chasing()
     {
+        
         AI.SetDestination(Player.position);
         transform.LookAt(Player);
 
@@ -236,7 +237,8 @@ public class AdvancedAi : MonoBehaviour, HearSound
 
     public void Seen()
     {
-        
+        AI.isStopped = true;
+        TimerStart = true;
     }
 
 

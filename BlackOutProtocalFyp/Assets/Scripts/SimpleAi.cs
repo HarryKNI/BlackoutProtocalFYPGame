@@ -68,7 +68,7 @@ public class SimpleAi : MonoBehaviour
         playerInsight = Physics.CheckSphere(transform.position, sightRange, whatIsPlayer);
         playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
 
-        if (!playerInsight && !playerInAttackRange ) m_States = States.Patrolling;
+        //if (!playerInsight && !playerInAttackRange ) m_States = States.Patrolling;
         if (playerInsight && !playerInAttackRange && AI.Raycast(Player.position, out Hit) == false) m_States = States.Chasing;
         if (playerInsight && playerInAttackRange && AI.Raycast(Player.position, out Hit) == false) m_States = States.Shooting;
 
@@ -91,7 +91,7 @@ public class SimpleAi : MonoBehaviour
 
     public void Idle()
     {
-        if (Timer == 0)
+        if (Timer >= 0)
         {
             TimerDone = true;
             TimerStart = false;
@@ -142,23 +142,6 @@ public class SimpleAi : MonoBehaviour
         AI.SetDestination(SearchPoints[1].position);
     }
 
-    private void OnTriggerEnter(Collider Coll)
-    {
-        
-        //if (Coll.gameObject.tag == "Player" && AI.Raycast(Player.position, out Hit) == false)
-        //{
-        //    TimerStart = false;
-        //    TimerDone = true;
-        //    m_States = States.Chasing;
-        //}
-
-        if (Coll.gameObject.tag == "AiBoundary")
-        {
-            m_States = States.AiReturn;
-        }
-
-    }
-
     private void OnTriggerExit(Collider Coll)
     {
         //if (Coll.gameObject.tag == "Player")
@@ -168,11 +151,12 @@ public class SimpleAi : MonoBehaviour
         //}
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider collision)
     {
         if (collision.gameObject.tag == "Search_Point")
         {
             m_States = States.Idle;
+            Timer = 10;
             TimerStart = true;
             print("Triggered");
             RndNum = UnityEngine.Random.Range(0, SearchPoints.Count);
